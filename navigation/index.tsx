@@ -1,31 +1,41 @@
-import { createStaticNavigation, StaticParamList } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { HeaderLogo } from 'components/commons/Header';
 import Overview from '../screens/overview';
-import Details from '../screens/details';
-import { BackButton } from '../components/BackButton';
 
-const Stack = createStackNavigator({
-  screens: {
-    Overview: {
-      screen: Overview,
-    },
-    Details: {
-      screen: Details,
-      options: ({ navigation }) => ({
-        headerLeft: () => <BackButton onPress={navigation.goBack} />,
-      }),
-    },
-  },
-});
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-type RootNavigatorParamList = StaticParamList<typeof Stack>;
+const App = (
+  <Tab.Navigator
+    initialRouteName="Overview"
+    screenOptions={{
+      headerShown: false,
+    }}>
+    <Tab.Screen
+      name="Overview"
+      component={Overview}
+      options={{ tabBarLabel: 'View', tabBarIcon: () => <Ionicons name="home" /> }}
+    />
+  </Tab.Navigator>
+);
 
-declare global {
-  namespace ReactNavigation {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface RootParamList extends RootNavigatorParamList {}
-  }
-}
+const AuthStack = (
+  <Stack.Navigator
+    screenOptions={{
+      headerShown: true,
+      headerShadowVisible: false,
+      headerTitle: () => <HeaderLogo />,
+    }}>
+    <Stack.Screen name="OverView" component={Overview} />
+  </Stack.Navigator>
+);
 
-const Navigation = createStaticNavigation(Stack);
-export default Navigation;
+const RootStack = () => {
+  const isAuthenticated: boolean = false;
+  return <NavigationContainer>{isAuthenticated ? App : AuthStack}</NavigationContainer>;
+};
+
+export default RootStack;
